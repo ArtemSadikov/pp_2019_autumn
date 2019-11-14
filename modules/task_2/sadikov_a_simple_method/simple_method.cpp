@@ -77,7 +77,7 @@ double* solve_simple(std::vector<double> delta_a, double* x,
                          static_cast<double>(delta_a[i * (size + 1) + i + core]);
         }
 
-        MPI_Allgatherv(&x[core], row_count, MPI_DOUBLE,
+        MPI_Allgatherv(&x[0] + core, row_count, MPI_DOUBLE,
                         &x[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                         MPI_COMM_WORLD);
 
