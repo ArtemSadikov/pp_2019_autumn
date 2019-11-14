@@ -30,36 +30,16 @@ bool is_equal(std::vector<double> x, std::vector<double> y) {
     return true;
 }
 
-/*void iter_vec(std::vector<double> vec, std::vector<double> x,
-             std::vector<double> x_old, int row_count,
-             int size, int core) {
-    double sum;
-
-    for (int i = 0; i < row_count; i++) {
-        sum = 0.0;
-        for (int j = 0; j < i + core; j++) {
-            sum += vec[i * (size + 1) + j] * x_old[j];
-        }
-
-        for (int j = 1 + core + i; j < size; j++) {
-            sum += vec[i * (size + 1) + j] * x_old[j];
-        }
-
-        x[i + core] = static_cast<double>(vec[i * (size + 1) + size] - sum) /
-                     static_cast<double>(vec[i * (size + 1) + i + core]);
-    }
-}*/
-
 std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double> x,
                  double error, int size, int rank, int row_count,
                  int size_proc) {
     std::vector<double> x_old;
     int iter = 0, core;
     double norm = 0;
-    std::vector<int> sendcounts, displs;
+    int *sendcounts, *displs;
 
-    sendcounts.resize(size_proc);
-    displs.resize(size_proc);
+    sendcounts = new int[size_proc];
+    displs = new int[size_proc];
 
     MPI_Scan(&row_count, &core, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     core -= row_count;
@@ -98,8 +78,8 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
                          static_cast<double>(delta_a[i * (size + 1) + i + core]);
         }
 
-        MPI_Allgatherv(&x[core], row_count, MPI_DOUBLE,
-                        &x[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
+        MPI_Allgatherv(&x[0] + core, row_count, MPI_DOUBLE,
+                        &x[0], sendcounts, displs, MPI_DOUBLE,
                         MPI_COMM_WORLD);
 
         if (rank == 0) {
@@ -118,6 +98,8 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     } while (error < norm);
 
+    delete[] sendcounts;
+    delete[] displs;
     return x;
 }
 
@@ -128,7 +110,7 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     int row_count, SIZE, size_proc, rank;
     std::vector<double> x;
     std::vector<double> delta_a;
-    std::vector<int> sendcounts, displs;
+    int *sendcounts, *displs;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -145,8 +127,9 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
                 ((size % size_proc) > rank ? 1 : 0);
 
     delta_a.resize((size + 1) * row_count);
-    displs.resize(size_proc);
-    sendcounts.resize(size_proc);
+
+    displs = new int[size_proc];
+    sendcounts = new int[size_proc];
 
     SIZE = (size + 1) * row_count;
 
@@ -164,5 +147,7 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
 
     x = solve_simple(delta_a, x, error, size, rank, row_count, size_proc);
 
+    delete[] displs;
+    delete[] sendcounts;
     return x;
 }
