@@ -1,7 +1,10 @@
 // Copyright 2019 Sadikov Artem
-#include <gtest-mpi-listener.hpp>
+#include <mpi.h>
 #include <gtest/gtest.h>
+#include <gtest-mpi-listener.hpp>
+
 #include <vector>
+
 #include "./simple_method.h"
 
 TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
