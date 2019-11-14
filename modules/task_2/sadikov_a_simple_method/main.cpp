@@ -40,7 +40,7 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
     }
 }
 
-/*TEST(DISABLED_Simple_Method_Slae, Cant_Get_Res_With_Wrong_Size) {
+/* TEST(DISABLED_Simple_Method_Slae, Cant_Get_Res_With_Wrong_Size) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -108,7 +108,7 @@ TEST(DISABLED_Simple_Method_Slae, Can_Create_Matrix_On_5_Size) {
 
 TEST(DISABLED_Simple_Method_Slae, Can_Create_Matrix_On_10_Size) {
     ASSERT_NO_THROW(std::vector<double> matrix = get_rand_matrix(10));
-}*/
+} */
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

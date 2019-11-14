@@ -103,8 +103,8 @@ double* solve_simple(std::vector<double> delta_a, double* x,
 }
 
 double* get_res(double* matrix, int size, double error) {
-    //if (size * (size + 1) != sizeof(matrix) / matrix[0])
-    //    throw "WRONG";
+    // if (size * (size + 1) != sizeof(matrix) / matrix[0])
+    //     throw "WRONG";
 
     int row_count, SIZE, size_proc, rank;
     double *x;
