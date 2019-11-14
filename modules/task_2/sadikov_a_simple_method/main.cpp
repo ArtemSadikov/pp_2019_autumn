@@ -30,14 +30,13 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
     double* actual = new double[3];
 
     actual = get_res(matrix, 3, 0.22);
-
-    if (rank == 0) {
-        double* expected = new double[3];
-        expected[0] = 1.03958;
-        expected[1] = 2.00833;
-        expected[2] = 3.05;
-        EXPECT_TRUE(is_equal(actual, expected));
-    }
+        if (rank == 0) {
+            double* expected = new double[3];
+            expected[0] = 1.03958;
+            expected[1] = 2.00833;
+            expected[2] = 3.05;
+            EXPECT_TRUE(is_equal(actual, expected));
+        }
 }
 
 /* TEST(DISABLED_Simple_Method_Slae, Cant_Get_Res_With_Wrong_Size) {

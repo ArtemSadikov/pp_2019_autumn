@@ -81,6 +81,9 @@ double* solve_simple(std::vector<double> delta_a, double* x,
                         &x[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                         MPI_COMM_WORLD);
 
+        /* MPI_Allgather(&x[core], sendcounts[rank], MPI_DOUBLE, &x[0],
+                        sendcounts[rank], MPI_DOUBLE, MPI_COMM_WORLD); */
+
         if (rank == 0) {
             std::vector<double> val(size);
             for (int i = 0; i < size; i++) {
