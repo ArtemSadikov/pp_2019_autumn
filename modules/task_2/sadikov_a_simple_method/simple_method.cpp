@@ -46,7 +46,6 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
 
     MPI_Allgather(&row_count, 1, MPI_INT, &sendcounts[0], 1, MPI_INT,
                  MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
 
     displs[0] = 0;
     for (int i = 1; i < size_proc; i++) {
@@ -78,10 +77,10 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
                          static_cast<double>(delta_a[i * (size + 1) + i + core]);
         }
 
-        MPI_Allgatherv(&x[0] + core, row_count, MPI_DOUBLE,
+        MPI_Allgatherv(&x[core], row_count, MPI_DOUBLE,
                         &x[0], sendcounts, displs, MPI_DOUBLE,
                         MPI_COMM_WORLD);
-
+        MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             std::vector<double> val(size);
             for (int i = 0; i < size; i++) {
