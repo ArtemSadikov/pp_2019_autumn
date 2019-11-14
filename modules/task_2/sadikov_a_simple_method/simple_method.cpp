@@ -7,14 +7,14 @@
 #include <limits>
 #include "../../../modules/task_2/sadikov_a_simple_method/simple_method.h"
 
-std::vector<double> get_rand_matrix(int size) {
+double* get_rand_matrix(int size) {
     if (size < 2)
         throw "ERR";
 
     std::mt19937 gen;
     gen.seed(static_cast<double>(time(NULL)));
 
-    std::vector<double> matrix(size * (size + 1));
+    double* matrix = new double[size];
     for (int i = 0; i < size * (size + 1); i++) {
         matrix[i] = gen() % 20;
     }
@@ -22,15 +22,15 @@ std::vector<double> get_rand_matrix(int size) {
     return matrix;
 }
 
-bool is_equal(std::vector<double> x, std::vector<double> y) {
-    for (int i = 0; i < static_cast<int>(x.size()); i++) {
+bool is_equal(double* x, double* y) {
+    for (int i = 0; i < sizeof(x) / x[0]; i++) {
         if (!(std::fabs(x[i] - y[i]) < 1e-4))
             return false;
     }
     return true;
 }
 
-std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double> x,
+double* solve_simple(std::vector<double> delta_a, double* x,
                  double error, int size, int rank, int row_count,
                  int size_proc) {
     std::vector<double> x_old;
@@ -80,7 +80,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
         MPI_Allgatherv(&x[core], row_count, MPI_DOUBLE,
                         &x[0], sendcounts, displs, MPI_DOUBLE,
                         MPI_COMM_WORLD);
-        MPI_Barrier(MPI_COMM_WORLD);
+
         if (rank == 0) {
             std::vector<double> val(size);
             for (int i = 0; i < size; i++) {
@@ -102,12 +102,12 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
     return x;
 }
 
-std::vector<double> get_res(std::vector<double> matrix, int size, double error) {
-    if (size * (size + 1) != static_cast<int>(matrix.size()))
-        throw "WRONG";
+double* get_res(double* matrix, int size, double error) {
+    //if (size * (size + 1) != sizeof(matrix) / matrix[0])
+    //    throw "WRONG";
 
     int row_count, SIZE, size_proc, rank;
-    std::vector<double> x;
+    double *x;
     std::vector<double> delta_a;
     int *sendcounts, *displs;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
@@ -116,11 +116,11 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    x.resize(size);
+    x = new double[size];
     if (rank == 0) {
         for (int i = 0; i < size; i++) { x[i] = 0.0; }
     }
-    MPI_Bcast(&x[0], size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(x, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     row_count = (size / size_proc) +
                 ((size % size_proc) > rank ? 1 : 0);

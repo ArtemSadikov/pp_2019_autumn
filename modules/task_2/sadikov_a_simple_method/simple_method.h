@@ -4,14 +4,11 @@
 
 #include <vector>
 
-std::vector<double> get_rand_matrix(int size);
-void iter_vec(std::vector<double> vec, std::vector<double> x,
-             std::vector<double> x_old, int row_count,
-             int size, int core);
-std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double> x,
+double* get_rand_matrix(int size);
+double* solve_simple(std::vector<double> delta_a, double* x,
                  double error, int size, int rank, int row_count,
                  int size_proc);
-bool is_equal(std::vector<double> x, std::vector<double> y);
-std::vector<double> get_res(std::vector<double> matrix, int size, double error);
+bool is_equal(double* x, double* y);
+double* get_res(double* matrix, int size, double error);
 
 #endif  // MODULES_TASK_2_SADIKOV_A_SIMPLE_METHOD_SIMPLE_METHOD_H_
