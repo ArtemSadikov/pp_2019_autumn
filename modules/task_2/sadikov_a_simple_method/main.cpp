@@ -29,7 +29,6 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
 
     double* actual = new double[3];
 
-    actual = get_res(matrix, 3, 0.22);
         if (rank == 0) {
             double* expected = new double[3];
             expected[0] = 1.03958;
@@ -38,6 +37,24 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
             EXPECT_TRUE(is_equal(actual, expected));
         }
 }
+
+/*TEST(Simple_Method_Slae, Test_On_Matrix_Size_10_Test) {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    double* matrix = new double[10];
+
+    if (rank == 0) {
+        matrix = get_rand_matrix(10);
+    }
+
+    double* actual = new double[10];
+
+    actual = get_res(matrix, 10, 0.0001);
+    if (rank == 0) {
+        EXPECT_FALSE(0);
+    }
+}*/
 
 /* TEST(DISABLED_Simple_Method_Slae, Cant_Get_Res_With_Wrong_Size) {
     int rank;
