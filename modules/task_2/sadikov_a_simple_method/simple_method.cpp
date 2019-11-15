@@ -102,8 +102,10 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     if (rank == 0) {
         m_size = size;
         eps = error;
-        MATRIX.resize(size * (size + 1));
-        MATRIX = matrix;
+        MATRIX = std::vector<double>(size * (size + 1));
+        for(int i = 0; i < size * (size + 1); i++){
+            MATRIX[i] = matrix[i];
+        }
     }
 
     MPI_Bcast(&m_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
