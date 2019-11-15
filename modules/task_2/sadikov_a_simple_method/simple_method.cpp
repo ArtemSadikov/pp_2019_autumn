@@ -127,8 +127,7 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
         displs[i] = displs[i - 1] + sendcounts[i - 1];
     }
 
-    std::vector<double> delta_a((m_size + 1) * row_count +
-                                (row_count > 0 ? 0 : 1));
+    std::vector<double> delta_a((m_size + 1) * row_count);
     MPI_Scatterv(&MATRIX[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                  &delta_a[0], SIZE, MPI_DOUBLE,
                  0, MPI_COMM_WORLD);
