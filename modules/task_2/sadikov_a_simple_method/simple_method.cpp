@@ -36,7 +36,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
     std::vector<double> temp(size);
     std::vector<int> sendcounts(size_proc);
     std::vector<int> displs(size_proc);
-    //std::vector<double> val(size);
+    // std::vector<double> val(size);
     int core;
     double norm = 0, val;
 
@@ -91,7 +91,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
 }
 
 std::vector<double> get_res(std::vector<double> matrix, int size, double error) {
-    //std::cout << static_cast<int>(matrix.size()) << '\n';
+    // std::cout << static_cast<int>(matrix.size()) << '\n';
     if (size * (size + 1) != static_cast<int>(matrix.size()))
         throw "WRONG";
 
