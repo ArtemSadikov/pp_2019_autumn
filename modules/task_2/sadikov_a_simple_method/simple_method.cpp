@@ -43,6 +43,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
 
     MPI_Scan(&row_count, &core, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     core -= row_count;
+    std::cout << "proc " << rank << ": " << core << '\n';
 
     MPI_Allgather(&row_count, 1, MPI_INT, &sendcounts[0], 1, MPI_INT,
                  MPI_COMM_WORLD);
@@ -111,6 +112,9 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     std::vector<int> sendcounts, displs;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (size_proc > size)
+        throw "ERR";
 
     MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
