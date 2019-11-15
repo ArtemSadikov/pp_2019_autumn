@@ -34,6 +34,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
                  double error, int size, int rank, int row_count,
                  int size_proc) {
     std::vector<double> x_old;
+    std::vector<double> temp;
     int iter = 0, core;
     double norm = 0;
     std::vector<int> sendcounts, displs;
@@ -55,6 +56,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
     }
 
     x_old.resize(size);
+    temp.resize(size);
     do {
         iter++;
         norm = x[0];
@@ -78,12 +80,9 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
                          static_cast<double>(delta_a[i * (size + 1) + i + core]);
         }
 
-        std::vector<double> temp(size);
-
         MPI_Allgatherv(&x[0] + core, row_count, MPI_DOUBLE,
                         &temp[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                         MPI_COMM_WORLD);
-
         x = temp;
         if (rank == 0) {
             std::vector<double> val(size);
