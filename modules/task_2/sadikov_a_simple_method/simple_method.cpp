@@ -55,7 +55,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
     }
 
     x_old.resize(size);
-
+    int k = 0;
     do {
         iter++;
         norm = x[0];
@@ -113,8 +113,8 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (size_proc > size)
-        throw "ERR";
+    /*if (size_proc > size)
+        throw "ERR";*/
 
     MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
