@@ -4,7 +4,6 @@
 #include <random>
 #include <ctime>
 #include <cmath>
-#include <limits>
 #include "../../../modules/task_2/sadikov_a_simple_method/simple_method.h"
 
 std::vector<double> get_rand_matrix(int size) {
@@ -33,35 +32,27 @@ bool is_equal(std::vector<double> x, std::vector<double> y) {
 std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double> x,
                  double error, int size, int rank, int row_count,
                  int size_proc) {
-    std::vector<double> x_old;
-    std::vector<double> temp;
-    int iter = 0, core;
-    double norm = 0;
-    std::vector<int> sendcounts, displs;
-
-    sendcounts.resize(size_proc);
-    displs.resize(size_proc);
+    std::vector<double> x_old(size);
+    std::vector<double> temp(size);
+    std::vector<int> sendcounts(size_proc);
+    std::vector<int> displs(size_proc);
+    //std::vector<double> val(size);
+    int core;
+    double norm = 0, val;
 
     MPI_Scan(&row_count, &core, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     core -= row_count;
-    // std::cout << "proc " << rank << ": " << core << '\n';
 
     MPI_Allgather(&row_count, 1, MPI_INT, &sendcounts[0], 1, MPI_INT,
                  MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
 
     displs[0] = 0;
     for (int i = 1; i < size_proc; i++) {
         displs[i] = displs[i - 1] + sendcounts[i - 1];
     }
 
-    x_old.resize(size);
-    temp.resize(size);
     do {
-        iter++;
-        norm = x[0];
-
-        for (int i = 0; i < size; i++) { x_old[i] = x[i]; }
+        x_old = x;
 
         double sum;
 
@@ -83,18 +74,14 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
         MPI_Allgatherv(&x[0] + core, row_count, MPI_DOUBLE,
                         &temp[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                         MPI_COMM_WORLD);
+
         x = temp;
+        norm = 0;
         if (rank == 0) {
-            std::vector<double> val(size);
             for (int i = 0; i < size; i++) {
-                val[i] = fabs(x[i] - x_old[i]);
+                val = fabs(x[i] - x_old[i]);
+                if (norm < val) norm = val;
             }
-            double mx = val[0];
-            for (int i = 0; i < size; i++) {
-                if (mx < val[i])
-                    mx = val[i];
-            }
-            norm = mx;
         }
 
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -104,34 +91,25 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
 }
 
 std::vector<double> get_res(std::vector<double> matrix, int size, double error) {
+    //std::cout << static_cast<int>(matrix.size()) << '\n';
     if (size * (size + 1) != static_cast<int>(matrix.size()))
         throw "WRONG";
 
     int row_count, SIZE, size_proc, rank;
-    std::vector<double> x;
-    std::vector<double> delta_a;
-    std::vector<int> sendcounts, displs;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    /*if (size_proc > size)
-        throw "ERR";*/
+    std::vector<int> sendcounts(size_proc);
+    std::vector<int> displs(size_proc);
+    std::vector<double> x(size);
+    std::vector<double> delta_a((size + 1) * row_count);
 
     MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    x.resize(size);
-    if (rank == 0) {
-        for (int i = 0; i < size; i++) { x[i] = 0.0; }
-    }
     MPI_Bcast(&x[0], size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     row_count = (size / size_proc) +
                 ((size % size_proc) > rank ? 1 : 0);
-
-    delta_a.resize((size + 1) * row_count);
-    displs.resize(size_proc);
-    sendcounts.resize(size_proc);
 
     SIZE = (size + 1) * row_count;
 
