@@ -94,21 +94,28 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     // std::cout << static_cast<int>(matrix.size()) << '\n';
     if (size * (size + 1) != static_cast<int>(matrix.size()))
         throw "WRONG";
-
-    int row_count, SIZE, size_proc, rank;
+    std::vector<double> MATRIX(size);
+    int size_proc, rank, m_size;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::vector<double> x(size);
+    int row_count, SIZE, eps;
+    if (rank == 0) {
+        m_size = size;
+        eps = error;
+        MATRIX.resize(size * (size + 1));
+        MATRIX = matrix;
+    }
 
-    MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&m_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    MPI_Bcast(&x[0], size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    std::vector<double> x(m_size);
+    MPI_Bcast(&x[0], m_size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    row_count = (size / size_proc) +
-                ((size % size_proc) > rank ? 1 : 0);
+    row_count = (m_size / size_proc) +
+                ((m_size % size_proc) > rank ? 1 : 0);
 
-    SIZE = (size + 1) * row_count;
+    SIZE = (m_size + 1) * row_count;
 
     std::vector<int> sendcounts(size_proc);
     MPI_Gather(&SIZE, 1, MPI_INT, &sendcounts[0], 1, MPI_INT, 0,
@@ -120,8 +127,9 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
         displs[i] = displs[i - 1] + sendcounts[i - 1];
     }
 
-    std::vector<double> delta_a((size + 1) * row_count);
-    MPI_Scatterv(&matrix[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
+    std::vector<double> delta_a((m_size + 1) * row_count +
+                                (row_count > 0 ? 0 : 1));
+    MPI_Scatterv(&MATRIX[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                  &delta_a[0], SIZE, MPI_DOUBLE,
                  0, MPI_COMM_WORLD);
 
