@@ -103,7 +103,7 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
         m_size = size;
         eps = error;
         MATRIX = std::vector<double>(size * (size + 1));
-        for(int i = 0; i < size * (size + 1); i++){
+        for (int i = 0; i < size * (size + 1); i++) {
             MATRIX[i] = matrix[i];
         }
     }
