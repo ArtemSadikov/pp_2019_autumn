@@ -43,7 +43,7 @@ std::vector<double> solve_simple(std::vector<double> delta_a, std::vector<double
 
     MPI_Scan(&row_count, &core, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     core -= row_count;
-    std::cout << "proc " << rank << ": " << core << '\n';
+    // std::cout << "proc " << rank << ": " << core << '\n';
 
     MPI_Allgather(&row_count, 1, MPI_INT, &sendcounts[0], 1, MPI_INT,
                  MPI_COMM_WORLD);
