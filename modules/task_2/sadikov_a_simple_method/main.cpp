@@ -24,11 +24,12 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
     }
 }
 
+
 TEST(Simple_Method_Slae, Cant_Get_Res_With_Wrong_Size) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    std::vector<double> matrix;
+    std::vector<double> matrix(4);
 
     if (rank == 0) {
         matrix = get_rand_matrix(4);
@@ -67,15 +68,33 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_4) {
 }
 
 TEST(Simple_Method_Slae, Not_Create_Matrix_If_Size_Less_Then_2) {
-    ASSERT_ANY_THROW(std::vector<double> matrix = get_rand_matrix(1));
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::vector<double> matrix(1);
+    if (rank == 0) {
+        ASSERT_ANY_THROW(matrix = get_rand_matrix(1));
+    }
 }
 
 TEST(Simple_Method_Slae, Can_Create_Matrix_On_5_Size) {
-    ASSERT_NO_THROW(std::vector<double> matrix = get_rand_matrix(5));
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::vector<double> matrix(5);
+    if (rank == 0) {
+        ASSERT_NO_THROW(matrix = get_rand_matrix(5));
+    }
 }
 
 TEST(Simple_Method_Slae, Can_Create_Matrix_On_10_Size) {
-    ASSERT_NO_THROW(std::vector<double> matrix = get_rand_matrix(10));
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::vector<double> matrix(10);
+    if (rank == 0) {
+        ASSERT_NO_THROW(matrix = get_rand_matrix(10));
+    }
 }
 
 int main(int argc, char** argv) {

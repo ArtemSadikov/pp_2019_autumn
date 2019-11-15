@@ -98,10 +98,7 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
     int row_count, SIZE, size_proc, rank;
     MPI_Comm_size(MPI_COMM_WORLD, &size_proc);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::vector<int> sendcounts(size_proc);
-    std::vector<int> displs(size_proc);
     std::vector<double> x(size);
-    std::vector<double> delta_a((size + 1) * row_count);
 
     MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&error, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -113,14 +110,17 @@ std::vector<double> get_res(std::vector<double> matrix, int size, double error) 
 
     SIZE = (size + 1) * row_count;
 
+    std::vector<int> sendcounts(size_proc);
     MPI_Gather(&SIZE, 1, MPI_INT, &sendcounts[0], 1, MPI_INT, 0,
                 MPI_COMM_WORLD);
 
+    std::vector<int> displs(size_proc);
     displs[0] = 0;
     for (int i = 1; i < size_proc; i++) {
         displs[i] = displs[i - 1] + sendcounts[i - 1];
     }
 
+    std::vector<double> delta_a((size + 1) * row_count);
     MPI_Scatterv(&matrix[0], &sendcounts[0], &displs[0], MPI_DOUBLE,
                  &delta_a[0], SIZE, MPI_DOUBLE,
                  0, MPI_COMM_WORLD);
