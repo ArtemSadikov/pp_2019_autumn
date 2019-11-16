@@ -8,14 +8,14 @@ TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    std::vector<double> matrix(12);
+    std::vector<double> Matrix(12);
     if (rank == 0) {
-        matrix = { 4, 1, 1, 9, 1, 6, -1, 10, 1, 2, 5, 20 };
+        Matrix = { 4, 1, 1, 9, 1, 6, -1, 10, 1, 2, 5, 20 };
     }
 
     std::vector<double> actual(3);
 
-    actual = get_res(matrix, 3, 0.22);
+    actual = get_res(Matrix, 3, 0.22);
 
     if (rank == 0) {
         std::vector<double> expected(3);
