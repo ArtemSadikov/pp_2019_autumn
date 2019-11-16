@@ -4,6 +4,8 @@
 #include <vector>
 #include "./simple_method.h"
 
+// &&&&
+
 TEST(Simple_Method_Slae, Test_On_Matrix_Size_3) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
