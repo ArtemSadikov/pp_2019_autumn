@@ -150,7 +150,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         }
         MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        
+
 
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
@@ -166,7 +166,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             displs[i] = i;
         }*/
 
-        
+
 
         /*MPI_Scatterv(&all_points[0], &sendcounts[0], &displs[0],
                      MPI_DOUBLE, &local_range[0], 2, MPI_DOUBLE, 0,
@@ -191,7 +191,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         }
 
         MPI_Barrier(MPI_COMM_WORLD);
-        
+
         /*MPI_Scatterv(&func_points[0], &sendcounts[0], &displs[0],
                      MPI_DOUBLE, &local_func_range[0], 2, MPI_DOUBLE, 0,
                      MPI_COMM_WORLD);*/
