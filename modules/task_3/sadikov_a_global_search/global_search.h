@@ -1,6 +1,7 @@
 // Copyright 2019 Sadikov Artem
 #ifndef MODULES_TASK_3_SADIKOV_A_GLOBAL_SEARCH_GLOBAL_SEARCH_H_
 #define MODULES_TASK_3_SADIKOV_A_GLOBAL_SEARCH_GLOBAL_SEARCH_H_
+
 #include <vector>
 
 std::vector<double> split_vec(double a, double b, int proc);

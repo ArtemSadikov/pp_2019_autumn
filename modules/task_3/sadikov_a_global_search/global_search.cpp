@@ -1,11 +1,11 @@
 // Copyright 2019 Sadikov Artem
+#include "../../../modules/task_3/sadikov_a_global_search/functions.h"
+#include "../../../modules/task_3/sadikov_a_global_search/global_search.h"
 #include <mpi.h>
 #include <vector>
 #include <random>
 #include <cmath>
 #include <algorithm>
-#include "../../../modules/task_3/sadikov_a_global_search/functions.h"
-#include "../../../modules/task_3/sadikov_a_global_search/global_search.h"
 
 bool equal(std::vector<double> actual, std::vector<double> expected) {
     for (int i = 0; i < 2; i++) {
@@ -101,7 +101,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         all_points[size + 1] = b;
     }
 
-    while (1) {
+    do {
         if (rank == 0) {
             std::vector<double> desc_vec(size + iter);
             func_points.resize(all_points.size());
@@ -148,8 +148,9 @@ std::vector<double> get_res(double a, double b, double r, double error,
                 }
             }
         }
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        if (norm <= error) break;
+        
 
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
@@ -157,25 +158,27 @@ std::vector<double> get_res(double a, double b, double r, double error,
         MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
                     MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        /*MPI_Barrier(MPI_COMM_WORLD);
         std::vector<int> sendcounts(size);
         std::vector<int> displs(size);
         for (int i = 0; i < size; i++) {
             sendcounts[i] = 2;
             displs[i] = i;
-        }
+        }*/
 
-        std::vector<double> local_range(2);
+        
 
-        MPI_Scatterv(&all_points[0], &sendcounts[0], &displs[0],
+        /*MPI_Scatterv(&all_points[0], &sendcounts[0], &displs[0],
                      MPI_DOUBLE, &local_range[0], 2, MPI_DOUBLE, 0,
-                     MPI_COMM_WORLD);
-        /*if (rank == 0) {
+                     MPI_COMM_WORLD);*/
+        if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&all_points[0] + max_intervals[proc] - 1, 2,
                          MPI_DOUBLE, proc, 0, MPI_COMM_WORLD);
             }
         }
+
+        std::vector<double> local_range(2);
 
         if (rank == 0) {
             for (int i = 0; i < 2; i++) {
@@ -185,22 +188,22 @@ std::vector<double> get_res(double a, double b, double r, double error,
             MPI_Status status;
             MPI_Recv(&local_range[0], 2, MPI_DOUBLE, 0, 0,
                      MPI_COMM_WORLD, &status);
-        }*/
+        }
 
         MPI_Barrier(MPI_COMM_WORLD);
-        std::vector<double> local_func_range(2);
-        MPI_Scatterv(&func_points[0], &sendcounts[0], &displs[0],
+        
+        /*MPI_Scatterv(&func_points[0], &sendcounts[0], &displs[0],
                      MPI_DOUBLE, &local_func_range[0], 2, MPI_DOUBLE, 0,
-                     MPI_COMM_WORLD);
+                     MPI_COMM_WORLD);*/
 
-        /*if (rank == 0) {
+        if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&func_points[0] + max_intervals[proc] - 1, 2,
                          MPI_DOUBLE, proc, 0, MPI_COMM_WORLD);
             }
         }
 
-
+        std::vector<double> local_func_range(2);
 
         if (rank == 0) {
             for (int i = 0; i < 2; i++) {
@@ -210,13 +213,13 @@ std::vector<double> get_res(double a, double b, double r, double error,
             MPI_Status status;
             MPI_Recv(&local_func_range[0], 2, MPI_DOUBLE, 0, 0,
                      MPI_COMM_WORLD, &status);
-        }*/
+        }
 
         double new_point = calc_new_point(local_range[0], local_range[1],
                                             local_func_range[0],
                                             local_func_range[1],
                                             M, max_num, size + iter);
-        // MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Gather(&new_point, 1, MPI_DOUBLE, &recv_points[0], 1, MPI_DOUBLE,
                     0, MPI_COMM_WORLD);
 
@@ -227,7 +230,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             std::sort(all_points.begin(), all_points.end());
             iter++;
         }
-    }
+    } while (norm > error);
 
     if (rank == 0) {
         res = { res_func_point, res_point };
