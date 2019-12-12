@@ -156,7 +156,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         int max_num;
         MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
                     MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        
+
         MPI_Barrier(MPI_COMM_WORLD);
         std::vector<int> sendcounts(size);
         std::vector<int> displs(size);
