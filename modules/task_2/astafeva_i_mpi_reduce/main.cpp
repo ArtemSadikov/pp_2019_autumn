@@ -257,6 +257,7 @@ TEST(MPI_Reduce_User, Sum_Works_Right_With_Int) {
 
     MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
     if (rank == 0) {
         ASSERT_EQ(recvbuf, checkbuf);
     }
@@ -393,6 +394,438 @@ TEST(MPI_Reduce_User, Int_Prod_Works_Right_With_Any_Root) {
     MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_INT, MPI_PROD, root, MPI_COMM_WORLD);
     if (rank == root) {
         ASSERT_EQ(recvbuf, checkbuf);
+    }
+}
+
+TEST(MPI_Reduce_User, Max_Works_Right_With_Float) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Min_Works_Right_With_Float) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_MIN, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_MIN, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Sum_Works_Right_With_Float) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Prod_Works_Right_With_Float) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_PROD, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_PROD, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Float_Max_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_MAX, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_MAX, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Float_Min_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_MIN, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_MIN, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Float_Sum_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_SUM, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_SUM, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Float_Prod_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<float> sendbuf(bufsize);
+    std::vector<float> recvbuf(bufsize);
+    std::vector<float> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_FLOAT, MPI_PROD, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_FLOAT, MPI_PROD, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_FLOAT_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Max_Works_Right_With_Double) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Min_Works_Right_With_Double) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Sum_Works_Right_With_Double) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Prod_Works_Right_With_Double) {
+    int rank, size;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_PROD, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_PROD, 0, MPI_COMM_WORLD);
+
+    if (rank == 0) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Double_Max_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_MAX, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_MAX, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Double_Min_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_MIN, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_MIN, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Double_Sum_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_SUM, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_SUM, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
+    }
+}
+
+TEST(MPI_Reduce_User, Double_Prod_Works_Right_With_Any_Root) {
+    int rank, size;
+    int root = 0;
+    int bufsize = 10;
+    std::vector<double> sendbuf(bufsize);
+    std::vector<double> recvbuf(bufsize);
+    std::vector<double> checkbuf(bufsize);
+    std::mt19937 gen(time(0));
+    std::uniform_real_distribution<> urd(0, 100);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    if (size > 2) {
+        root = size - 2;
+    }
+
+    for (int i = 0; i < bufsize; i++) {
+        sendbuf[i] = urd(gen);
+    }
+
+    MPI_Reduce_User(&sendbuf[0], &recvbuf[0], bufsize, MPI_DOUBLE, MPI_PROD, root, MPI_COMM_WORLD);
+    MPI_Reduce(&sendbuf[0], &checkbuf[0], bufsize, MPI_DOUBLE, MPI_PROD, root, MPI_COMM_WORLD);
+
+    if (rank == root) {
+        for (int i = 0; i < bufsize; i++) {
+            ASSERT_DOUBLE_EQ(recvbuf[i], checkbuf[i]);
+        }
     }
 }
 
