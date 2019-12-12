@@ -56,7 +56,7 @@ double interval_R(double a, double b, double x_l, double x_r,
     res = x_r - x_l +
          static_cast<double>(pow(func_x_r - func_x_l, 2)) /
          static_cast<double>(pow(M, 2) * delta) - 2 *
-         (static_cast<double>(func_x_r + func_x_l) / static_cast<double>(M)); 
+         (static_cast<double>(func_x_r + func_x_l) / static_cast<double>(M));
 
     return res;
 }
@@ -200,7 +200,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
                                             local_func_range[0],
                                             local_func_range[1],
                                             M, max_num, size + iter);
-        
+
         MPI_Gather(&new_point, 1, MPI_DOUBLE, &recv_points[0], 1, MPI_DOUBLE,
                     0, MPI_COMM_WORLD);
 
