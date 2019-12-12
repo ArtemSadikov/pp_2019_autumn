@@ -1,5 +1,4 @@
 // Copyright 2019 Sadikov Artem
-#include "../../../modules/task_3/sadikov_a_global_search/functions.h"
 #include "../../../modules/task_3/sadikov_a_global_search/global_search.h"
 #include <mpi.h>
 #include <vector>
