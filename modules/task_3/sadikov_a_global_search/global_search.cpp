@@ -177,6 +177,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
                      MPI_COMM_WORLD, &status);
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&func_points[0] + max_intervals[proc] - 1, 2,
@@ -200,7 +201,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
                                             local_func_range[0],
                                             local_func_range[1],
                                             M, max_num, size + iter);
-
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Gather(&new_point, 1, MPI_DOUBLE, &recv_points[0], 1, MPI_DOUBLE,
                     0, MPI_COMM_WORLD);
 
