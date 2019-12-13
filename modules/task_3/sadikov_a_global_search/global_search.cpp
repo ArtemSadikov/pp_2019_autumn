@@ -113,7 +113,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
 
         MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        MPI_Barrier(MPI_COMM_WORLD);
+
         if (rank == 0) {
             desc_vec.resize(size + iter);
             for (int i = 0; i < size + iter; i++) {
@@ -157,11 +157,24 @@ std::vector<double> get_res(double a, double b, double r, double error,
         if (norm <= error) break;
 
 
-        MPI_Barrier(MPI_COMM_WORLD);
         int max_num;
-        MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
-                    MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        // MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
+        //             MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        
+        if (rank == 0) {
+            for (int proc = 1; proc < size; proc++) {
+                MPI_Send(&max_intervals[0] + proc, 1, MPI_INT, proc, 0,
+                         MPI_COMM_WORLD);
+            }
+        }
 
+        if (rank == 0) {
+            max_num = max_intervals[0];
+        } else {
+            MPI_Status status;
+            MPI_Recv(&max_num, 1, MPI_INT, 0, 0, MPI_COMM_WORLD,
+                     &status);
+        }
         MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
