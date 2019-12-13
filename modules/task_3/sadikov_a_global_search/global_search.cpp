@@ -53,8 +53,8 @@ double interval_R(double a, double b, double x_l, double x_r,
     }
 
     res = x_r - x_l +
-         static_cast<double>(pow(func_x_r - func_x_l, 2)) /
-         static_cast<double>(pow(M, 2) * delta) - 2 *
+         static_cast<double>(std::pow(func_x_r - func_x_l, 2)) /
+         static_cast<double>(std::pow(M, 2) * delta) - 2 *
          (static_cast<double>(func_x_r + func_x_l) / static_cast<double>(M));
 
     return res;
@@ -87,6 +87,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
     double res_func_point;
     double M;
     int iter = 1;
+    std::vector<double> desc_vec;
     double norm;
 
     if (rank == 0) {
@@ -102,14 +103,19 @@ std::vector<double> get_res(double a, double b, double r, double error,
 
     do {
         if (rank == 0) {
-            std::vector<double> desc_vec(size + iter);
             func_points.resize(all_points.size());
-            for (int i = 0; i < static_cast<int>(all_points.size()); i++) {
+            for (int i = 0; i < static_cast<int>(func_points.size()); i++) {
                 func_points[i] = func(all_points[i]);
             }
 
             M = calc_M(r, all_points, func_points);
 
+        }
+
+        MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+        if (rank == 0) {
+            desc_vec.resize(size + iter);
             for (int i = 0; i < size + iter; i++) {
                 desc_vec[i] = interval_R(a, b,
                                          all_points[i], all_points[i + 1],
@@ -122,7 +128,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             }
 
             double m;
-            for (int i = 0; i < size + 1; i++) {
+            for (int i = 0; i < size + iter; i++) {
                 m = *std::min_element(max_intervals.begin(),
                                      max_intervals.end());
                 for (int j = 0; j < size; j++) {
@@ -139,7 +145,6 @@ std::vector<double> get_res(double a, double b, double r, double error,
             for (int i = 0; i < size; i++) {
                 double dVal = all_points[max_intervals[i]] -
                                 all_points[max_intervals[i] - 1];
-
                 if (dVal > norm) {
                     norm = dVal;
                     res_point = all_points[max_intervals[i]];
@@ -147,29 +152,14 @@ std::vector<double> get_res(double a, double b, double r, double error,
                 }
             }
         }
-        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 
-        MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
         int max_num;
         MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
                     MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-        /*MPI_Barrier(MPI_COMM_WORLD);
-        std::vector<int> sendcounts(size);
-        std::vector<int> displs(size);
-        for (int i = 0; i < size; i++) {
-            sendcounts[i] = 2;
-            displs[i] = i;
-        }*/
-
-
-
-        /*MPI_Scatterv(&all_points[0], &sendcounts[0], &displs[0],
-                     MPI_DOUBLE, &local_range[0], 2, MPI_DOUBLE, 0,
-                     MPI_COMM_WORLD);*/
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&all_points[0] + max_intervals[proc] - 1, 2,
@@ -190,10 +180,6 @@ std::vector<double> get_res(double a, double b, double r, double error,
         }
 
         MPI_Barrier(MPI_COMM_WORLD);
-
-        /*MPI_Scatterv(&func_points[0], &sendcounts[0], &displs[0],
-                     MPI_DOUBLE, &local_func_range[0], 2, MPI_DOUBLE, 0,
-                     MPI_COMM_WORLD);*/
 
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
