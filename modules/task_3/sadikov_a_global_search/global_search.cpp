@@ -100,7 +100,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
 
         all_points[size + 1] = b;
     }
-
+    MPI_Barrier(MPI_COMM_WORLD);
     while (1) {
         if (rank == 0) {
             func_points.resize(all_points.size());
