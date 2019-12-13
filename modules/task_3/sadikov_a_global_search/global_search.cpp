@@ -113,7 +113,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
 
         MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
+        MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             desc_vec.resize(size + iter);
             for (int i = 0; i < size + iter; i++) {
