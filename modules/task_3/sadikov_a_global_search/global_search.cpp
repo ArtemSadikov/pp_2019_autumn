@@ -109,7 +109,6 @@ std::vector<double> get_res(double a, double b, double r, double error,
             }
 
             M = calc_M(r, all_points, func_points);
-
         }
 
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);

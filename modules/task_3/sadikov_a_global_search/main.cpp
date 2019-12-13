@@ -14,9 +14,6 @@ TEST(DISABLED_Global_Search_MPI, Test_On_First_Func) {
 
     if (rank == 0) {
         std::vector<double> expected(2);
-        for (auto x: actual) {
-            std::cout << x << std::endl << std::endl;
-        }
         expected = { 0.841, 1.000 };
         EXPECT_EQ(1, equal(actual, expected));
     }
