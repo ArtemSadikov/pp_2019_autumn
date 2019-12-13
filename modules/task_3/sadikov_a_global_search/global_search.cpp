@@ -101,7 +101,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         all_points[size + 1] = b;
     }
 
-    do {
+    while (1) {
         if (rank == 0) {
             func_points.resize(all_points.size());
             for (int i = 0; i < static_cast<int>(func_points.size()); i++) {
@@ -152,7 +152,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             }
         }
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
+        if (norm <= error) break;
 
 
         int max_num;
@@ -177,8 +177,6 @@ std::vector<double> get_res(double a, double b, double r, double error,
             MPI_Recv(&local_range[0], 2, MPI_DOUBLE, 0, 0,
                      MPI_COMM_WORLD, &status);
         }
-
-        MPI_Barrier(MPI_COMM_WORLD);
 
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
@@ -214,7 +212,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             std::sort(all_points.begin(), all_points.end());
             iter++;
         }
-    } while (norm > error);
+    }
 
     if (rank == 0) {
         res = { res_func_point, res_point };
