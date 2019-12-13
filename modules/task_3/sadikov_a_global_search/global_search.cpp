@@ -111,6 +111,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             M = calc_M(r, all_points, func_points);
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&M, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
         if (rank == 0) {
@@ -151,14 +152,17 @@ std::vector<double> get_res(double a, double b, double r, double error,
                 }
             }
         }
+        MPI_Barrier(MPI_COMM_WORLD);
         MPI_Bcast(&norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
         if (norm <= error) break;
 
 
+        MPI_Barrier(MPI_COMM_WORLD);
         int max_num;
         MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
                     MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+        MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&all_points[0] + max_intervals[proc] - 1, 2,
@@ -178,6 +182,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
                      MPI_COMM_WORLD, &status);
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&func_points[0] + max_intervals[proc] - 1, 2,
@@ -196,7 +201,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             MPI_Recv(&local_func_range[0], 2, MPI_DOUBLE, 0, 0,
                      MPI_COMM_WORLD, &status);
         }
-
+        MPI_Barrier(MPI_COMM_WORLD);
         double new_point = calc_new_point(local_range[0], local_range[1],
                                             local_func_range[0],
                                             local_func_range[1],
