@@ -160,7 +160,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
         int max_num;
         // MPI_Scatter(&max_intervals[0], 1, MPI_INT, &max_num, 1,
         //             MPI_DOUBLE, 0, MPI_COMM_WORLD);
-        
+
         if (rank == 0) {
             for (int proc = 1; proc < size; proc++) {
                 MPI_Send(&max_intervals[0] + proc, 1, MPI_INT, proc, 0,
