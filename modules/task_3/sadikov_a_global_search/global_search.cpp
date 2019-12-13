@@ -169,7 +169,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
                          MPI_DOUBLE, proc, 0, MPI_COMM_WORLD);
             }
         }
-
+        MPI_Barrier(MPI_COMM_WORLD);
         std::vector<double> local_range(2);
 
         if (rank == 0) {
@@ -190,6 +190,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             }
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
         std::vector<double> local_func_range(2);
 
         if (rank == 0) {
@@ -217,6 +218,7 @@ std::vector<double> get_res(double a, double b, double r, double error,
             std::sort(all_points.begin(), all_points.end());
             iter++;
         }
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
     if (rank == 0) {
