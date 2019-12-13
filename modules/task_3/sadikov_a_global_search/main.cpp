@@ -5,12 +5,12 @@
 #include "./global_search.h"
 #include "./functions.h"
 
-TEST(DISABLED_Global_Search_MPI, Test_On_First_Func) {
+TEST(Global_Search_MPI, Test_On_First_Func) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     std::vector<double> actual(2);
 
-    actual = get_res(1.0, 8.0, 2.0, 0.0001, func1);
+    actual = get_res(1.0, 2.0, 2.0, 0.0001, func1);
 
     if (rank == 0) {
         std::vector<double> expected(2);
